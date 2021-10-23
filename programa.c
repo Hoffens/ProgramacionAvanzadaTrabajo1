@@ -62,10 +62,11 @@ int main()
     printf("TIEMPO TOTAL: %f \n ", time1);
     */
     //generar_sistema(6, 7, &M);
+    //printf("Primo P => %lld\n", P);
     leer_archivo(&M);
-    imprimir_sistema(&M);
+    //imprimir_sistema(&M);
     //printf("--------- \n");
-    //gaussiana_triangular_superior(&M, &X);
+    gaussiana_triangular_superior(&M, &X);
     //triangulacion_inferior(&M);
     //eliminacion_gaussiana_completa(&M, &X);
     //matriz_inversa(&M, &X);
@@ -106,7 +107,7 @@ void imprimir_sistema(matriz *M)
         printf("[ ");
         for (j = 0 ; j < M->c ; j++)
         {
-            printf("%ld ", (M->m)[i].d[j]);
+            printf("%lld ", (M->m)[i].d[j]);
         }
         printf("] \n");
     }
@@ -122,7 +123,7 @@ void imprimir_solucion(matriz *M, matriz *X)
     printf("-----------------------------------------------\n");
     for (i = 0 ; i < X->f ; i++)
     {
-        printf("SOLUCION X%d : %ld \n", i , (X->m)[i].d[0]);
+        printf("SOLUCION X%d : %lld \n", i , (X->m)[i].d[0]);
     }
     printf("-----------------------------------------------\n");
 }
@@ -467,23 +468,24 @@ void leer_archivo(matriz *M)
     M->f = n;
     M->c = m;
     M->m = (fila *)malloc(n * sizeof(fila));
-    
+
     for (i = 0; i < n; i++)
     {
         F.d = (long long *)malloc(m * sizeof(long long));
         (M->m)[i] = F;
         for (j = 0; j < m; j++)
         {
-            num=0;
+            num = 0;
             while ((bus = fgetc(archivo)) != ' ')
             {
-                if(bus =='\n'||bus == ' ')
+                if (bus =='\n' || bus == ' ')
                     break;
                     num = num * 10 + (long long)bus - 48;
             }
             (F.d)[j] = num;
         }
     }
+
     fclose(archivo);
 }
 
