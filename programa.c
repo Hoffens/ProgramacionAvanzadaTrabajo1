@@ -3,11 +3,14 @@
 #include <math.h>
 #include <time.h>
 
-#define P 2147483647
+#define P (long long)3781996138433268199
+#define Pa (long long)1761129190
+#define Pb (long long)892783079
+#define bAJO (long long)2147483647
 
 typedef struct
 {
-    long *d;
+    long long *d;
 } fila;
 
 typedef struct
@@ -18,10 +21,11 @@ typedef struct
 } matriz;
 
 //Funciones del archivo formato lab 1
-long SumaP( long a , long b ) ;
-long RestaP( long a , long b ) ;
-long MultP( long a , long b) ;
-long InvP( long a ) ;
+long long SumaP( long long a , long long b ) ;
+long long RestaP( long long a , long long b ) ;
+long long MultP( long long a , long long b) ;
+long long InvP( long long a ) ;
+
 //Funciones nuestras
 void generar_sistema(int n, int m, matriz *M);
 void imprimir_sistema(matriz *M);
@@ -35,6 +39,7 @@ void leer_archivo(matriz *M);
 
 int main()
 {
+    // falta limpiar la memoria
     matriz M, X;
     int i, j = 0;
     double t0, t1, time1;
@@ -44,7 +49,7 @@ int main()
     //t0 = clock();
     //printf("%ld \n", clock());
     srand(time(NULL));
-    //long *c;
+    //long long *c;
     t0 = clock();
     /*
     for ( i = 0 ; i < 600 ; i++)
@@ -58,11 +63,12 @@ int main()
     */
     //generar_sistema(6, 7, &M);
     leer_archivo(&M);
+    imprimir_sistema(&M);
     //printf("--------- \n");
     //gaussiana_triangular_superior(&M, &X);
     //triangulacion_inferior(&M);
     //eliminacion_gaussiana_completa(&M, &X);
-    matriz_inversa(&M, &X);
+    //matriz_inversa(&M, &X);
     //printf("--------- \n");
     //printf("--------- \n");
     //t1 = clock();
@@ -81,11 +87,11 @@ void generar_sistema(int n, int m, matriz *M)
 
     for (i = 0 ; i < n ; i++)
     {
-        F.d = (long *)malloc(m * sizeof(long));
+        F.d = (long long *)malloc(m * sizeof(long long));
         (M->m)[i] = F;
         for (j = 0 ; j < m ; j++)
         {   
-            (F.d)[j] = (long)(rand() % P);
+            (F.d)[j] = (long long)(rand() % P);
         }
     }
     //printf("%ld ", (M->m)[0].d[1]); //EJEMPLO, NO BORRAR: se accede al elemento de la fila 0 columna 1 
@@ -125,7 +131,7 @@ void imprimir_solucion(matriz *M, matriz *X)
 void triangulacion_superior(matriz *M)
 {
     int i, j, k;
-    long multiplicador, num_multiplicado;
+    long long multiplicador, num_multiplicado;
 
     for (k = 0 ; k < ((M->f)-1) ; k++) //n pasos (n cantidad de filas)
     {
@@ -149,7 +155,7 @@ void triangulacion_superior(matriz *M)
 void triangulacion_inferior(matriz *M)
 {
     int i, j, k;
-    long multiplicador, num_multiplicado;
+    long long multiplicador, num_multiplicado;
 
     for (k = ((M->f)-1) ; k > 0 ; k--)
     {   
@@ -174,7 +180,7 @@ void gaussiana_triangular_superior(matriz *M, matriz *X)
 {   
     fila F;
     int i, j, k;
-    long multiplicador, num_multiplicado, sumatoria, resta;
+    long long multiplicador, num_multiplicado, sumatoria, resta;
     double t0, t1, time;
     X->f = M->f;
     X->c = 1;
@@ -195,7 +201,7 @@ void gaussiana_triangular_superior(matriz *M, matriz *X)
 
     for (i = 0; i < X->f ; i++)
     {   
-        F.d = (long *)malloc(X->c * sizeof(long));
+        F.d = (long long *)malloc(X->c * sizeof(long long));
         (X->m)[i] = F;
         if (i == ((X->f)-1))    //Ultimo elemento del vector solucion
         {
@@ -265,7 +271,7 @@ void eliminacion_gaussiana_completa(matriz *M, matriz *X)
 
     for (i = 0; i < X->f ; i++)
     {   
-        F.d = (long *)malloc(X->c * sizeof(long));
+        F.d = (long long *)malloc(X->c * sizeof(long long));
         (X->m)[i] = F;
         (F.d)[0] = MultP( (M->m)[i].d[((M->c)-1)]  , InvP ( (M->m)[i].d[i] ) ); //Solucion Xi del sistema
     }
@@ -284,12 +290,13 @@ void eliminacion_gaussiana_completa(matriz *M, matriz *X)
     printf("TIEMPO TOTAL EN SEGUNDOS: %f  \n" , time);
     printf("-----------------------------------------------\n");
 }
+
 //NO FUNCIONA
 void matriz_inversa(matriz *M, matriz *I)
 {
     fila F;
     int i, j, k;
-    long multiplicador, num_multiplicado;
+    long long multiplicador, num_multiplicado;
     I->c = M->c;
     I->f = M->f;
     I->m = (fila *)malloc(I->f * sizeof(fila));
@@ -299,7 +306,7 @@ void matriz_inversa(matriz *M, matriz *I)
 
     for (i = 0 ; i < I->f ; i++)
     {
-        F.d = (long *)malloc(I->c * sizeof(long));
+        F.d = (long long *)malloc(I->c * sizeof(long long));
         (I->m)[i] = F;
         for (j = 0 ; j < I->c ; j++)
         {
@@ -375,7 +382,7 @@ void matriz_inversa(matriz *M, matriz *I)
     printf("MATRIZ IDENTIDAD NUEVA \n");
     imprimir_sistema(I);
 
-    long inv;
+    long long inv;
     printf("----------\n");
     imprimir_sistema(M);
     printf("----------\n");
@@ -389,7 +396,8 @@ void matriz_inversa(matriz *M, matriz *I)
                 inv = InvP( (M->m)[i].d[j] );
                 (M->m)[i].d[j] = MultP( (M->m)[i].d[j] , inv );
                 (I->m)[i].d[j] = MultP( (I->m)[i].d[j] , inv );
-            }else
+            }
+            else
             {
                 (I->m)[i].d[j] = MultP( (I->m)[i].d[j] , inv );    
             }
@@ -406,7 +414,7 @@ void matriz_inversa(matriz *M, matriz *I)
 /*
     //INICIO CONVERTIR DIAGONAL EN 1
 
-    long inv;
+    long long inv;
 
     for (i = 0 ; i < M->f ; i++)
     {
@@ -428,14 +436,14 @@ void matriz_inversa(matriz *M, matriz *I)
 void leer_archivo(matriz *M)
 {
     int n = 0, m = 0;
-    long num;
+    long long num;
     FILE *archivo;
     char bus;
 
     fila F;
     int i, j;
 
-    archivo = fopen("matriz2.txt", "r");
+    archivo = fopen("matriz2021.txt", "r");
 
     if (archivo == NULL)
     {
@@ -446,25 +454,23 @@ void leer_archivo(matriz *M)
         while ((bus = fgetc(archivo)) != ' ')
         {
             if (bus != ' ')
-                n = n * 10 + (long)bus - 48;
+                n = n * 10 + (long long)bus - 48;
         }
 
         while ((bus = fgetc(archivo)) != '\n')
         {
             //if (bus != '\n')
-                m = m * 10 + (long)bus - 48;
+            m = m * 10 + (long long)bus - 48;
         }
-
-        //printf("n= %d \n", n);
-        //printf("m= %d \n", m);
     }
 
     M->f = n;
     M->c = m;
     M->m = (fila *)malloc(n * sizeof(fila));
+    
     for (i = 0; i < n; i++)
     {
-        F.d = (long *)malloc(m * sizeof(long));
+        F.d = (long long *)malloc(m * sizeof(long long));
         (M->m)[i] = F;
         for (j = 0; j < m; j++)
         {
@@ -473,20 +479,18 @@ void leer_archivo(matriz *M)
             {
                 if(bus =='\n'||bus == ' ')
                     break;
-                    num = num * 10 + (long)bus - 48;
+                    num = num * 10 + (long long)bus - 48;
             }
             (F.d)[j] = num;
-            //printf("%ld ", (F.d)[j]);
         }
-        //printf("\n");
     }
     fclose(archivo);
 }
 
 
-long SumaP( long a , long b )
+long long SumaP( long long a , long long b )
 {
-    long c;
+    long long c;
     c = a + b ;
     if ( c < P )
     {
@@ -499,7 +503,7 @@ long SumaP( long a , long b )
 }
 
 
-long RestaP( long a , long b )
+long long RestaP( long long a , long long b )
 {
     if ( a < b )
     {
@@ -512,30 +516,62 @@ long RestaP( long a , long b )
 }
 
 
-long MultP( long a , long b)
+long long MultP( long long a , long long b)
 {
-    long c,d;
-    c = a * b ;
-    d = c >> 31 ;
-    c = ( c ^ ( d << 31 ) ) + d ;
-    if ( c < P )
+    long long a0,a1,b0,b1,d0,d1,d2,d3 ;
+    long long c ;
+    
+    a0 = a & bAJO ;
+    a1 = a>>31 ;
+    b0 = b & bAJO ;
+    b1 = b>>31 ;
+    d0 = a0 * b0 ;
+    d3 = a1 * b1 ;
+    a1 += a0 ;
+    b1 += b0 ;
+    d2 = d0 + d3 ;
+    d1 = a1 * b1 ;
+    d1 -= d2 ;
+    d3 += ( d1>>31 ) ;
+    d2 = d1 & bAJO ;
+    d2 += d0>>31 ;
+    d1 = d0 & bAJO ;
+    a1 = d3 / Pa ;
+    b1 = ( ( d3 % Pa )<<31 ) + d2 - ( a1 * Pb ) ;
+    while ( b1 < 0 )
     {
-        return(c);
+        b1 += P ;
     }
-    else
+    while ( b1 >= P )
     {
-        return(c-P);
+        b1 -= P ;
     }
+    a0 = b1 / Pa ;
+    b0 = ( ( b1 % Pa )<<31 ) + d1 - ( a0 * Pb ) ;
+    while ( b0 < 0 )
+    {
+        b0 += P ;
+    }
+    while ( b0 >= P )
+    {
+        b0 -= P ;
+    }
+    return(b0);
 }
 
 
-long InvP( long A )
+long long InvP( long long A )
 {
-    long a,b,s1,s2,r,u;
+    long long a,b,s1,s2,r,u;
     a = A ;
     b = P ;
     s1 = 1 ;
     s2 = 0 ;
+    if ( A == 0 )
+    {
+        printf("Error, division entre 0\n");
+        return(0);
+    }
     while ( ( a % 2 ) == 0 )
     {
         a >>= 1 ;
