@@ -32,9 +32,10 @@ void imprimir_sistema(matriz *M, int n, int m);
 void imprimir_solucion(matriz *M, matriz *X);
 void triangulacion_superior(matriz *M);
 void triangulacion_inferior(matriz *M);
-void gaussiana_triangular_superior(matriz *M, matriz *X);
-void eliminacion_gaussiana_completa(matriz *M, matriz *X);
-void matriz_inversa(matriz *M, matriz *I);
+double gaussiana_triangular_superior(matriz *M, matriz *X);
+double eliminacion_gaussiana_completa(matriz *M, matriz *X);
+double matriz_inversa(matriz *M, matriz *I);
+double solucion_matriz_inversa(matriz *M, matriz *X);  // Utiliza la matriz inversa para dar solución al sistema
 
 void leer_archivo(matriz *M);
 
@@ -69,9 +70,11 @@ int main()
     //printf("--------- \n");
     //gaussiana_triangular_superior(&M, &X);
     //triangulacion_inferior(&M);
-    //eliminacion_gaussiana_completa(&M, &X);
+    time1 = eliminacion_gaussiana_completa(&M, &X);
     //matriz_inversa(&M, &X);
-    matriz_inversa(&M, &X);
+    //matriz_inversa(&M, &X);
+    //time1 = solucion_matriz_inversa(&M, &X);
+    printf("TIEMPO TOTAL EN SEGUNDOS: %f  \n" , time1);
     //printf("--------- \n");
     //printf("--------- \n");
     //t1 = clock();
@@ -180,7 +183,7 @@ void triangulacion_inferior(matriz *M)
 }
 
 
-void gaussiana_triangular_superior(matriz *M, matriz *X)
+double gaussiana_triangular_superior(matriz *M, matriz *X)
 {   
     fila F;
     int i, j, k;
@@ -242,14 +245,11 @@ void gaussiana_triangular_superior(matriz *M, matriz *X)
         imprimir_solucion(M, X);
     }
     
-    time = ((t1 - t0) / CLOCKS_PER_SEC);
-    printf("FINALIZADO. \n");
-    printf("TIEMPO TOTAL EN SEGUNDOS: %f  \n" , time);
-    printf("-----------------------------------------------\n");
+    return time = ((t1 - t0) / CLOCKS_PER_SEC);
 }
 
 
-void eliminacion_gaussiana_completa(matriz *M, matriz *X)
+double eliminacion_gaussiana_completa(matriz *M, matriz *X)
 {
     fila F;
     int i;
@@ -289,14 +289,11 @@ void eliminacion_gaussiana_completa(matriz *M, matriz *X)
         imprimir_solucion(M, X);
     }
 
-    time = ((t1 - t0) / CLOCKS_PER_SEC);
-    printf("FINALIZADO. \n");
-    printf("TIEMPO TOTAL EN SEGUNDOS: %f  \n" , time);
-    printf("-----------------------------------------------\n");
+    return time = ((t1 - t0) / CLOCKS_PER_SEC);
 }
 
 
-void matriz_inversa(matriz *M, matriz *I) 
+double matriz_inversa(matriz *M, matriz *I) 
 {   
     int i, j, k;
     long long temp;
@@ -306,7 +303,7 @@ void matriz_inversa(matriz *M, matriz *I)
     I->f = M->f;
     I->m = (fila *)malloc(I->f * sizeof(fila));
 
-    //CREACIÓN DE LA MATRIZ M AUMENTADA CON LA IDENTIDAD (NO SE TOMA EN CUENTA EN EL CALCULO DEL TIEMPO)
+    //CREACIÓN DE LA MATRIZ M AUMENTADA CON LA IDENTIDAD (NO SE CONSIDERA PARA LA MEDICIÓN DEL TIEMPO)
     for (i = 0 ; i < M->f; i++) 
     {
         F.d = (long long *)malloc((I->c * 2) * sizeof(long long));
@@ -324,7 +321,7 @@ void matriz_inversa(matriz *M, matriz *I)
         }
     }
      
-    // Se agregan los 1's en la diagonal de la matriz aumentada (NO SE TOMA EN CUENTA EN EL CALCULO DEL TIEMPO)
+    // Se agregan los 1's en la diagonal de la matriz aumentada (NO SE CONSIDERA PARA LA MEDICIÓN DEL TIEMPO)
     for (i = 0; i < I->f; i++)
     {
         for (j = 0; j < I->f * 2; j++)
@@ -376,18 +373,58 @@ void matriz_inversa(matriz *M, matriz *I)
 
     t1 = clock();   // Fin de medición de tiempo
     
-    // Muestra en pantalla la matriz aumentada final, a la izquierda queda la identidad y a la derecha la inversa
+    // Muestra en pantalla solamente si el sistema es pequeño, 
+    // la matriz aumentada final. A la izquierda queda la identidad y a la derecha la inversa
     if ( I->f <= 6 && I->c <= 7) 
     {
-        printf("Matriz inversa: \n");
+        printf("Matriz inversa (aumentada): \n");
         imprimir_sistema(I, I->f, I->c * 2); 
     }
-    
+
     time = ((t1 - t0) / CLOCKS_PER_SEC);
-    printf("FINALIZADO. \n");
-    printf("TIEMPO TOTAL EN SEGUNDOS: %f  \n" , time);
-    printf("-----------------------------------------------\n");
+    
+    return time;
 }
+
+
+double solucion_matriz_inversa(matriz *M, matriz *I) 
+{   
+    int i, j, k, p;
+    long long resultado;
+    double t0, t1, time, timeInv;
+    
+    // Obtenemos la inversa de M
+    timeInv = matriz_inversa(M, I);
+    // Ahora I es una matriz aumentada de la forma I|M^-1
+
+    t0 = clock();   // Inicio medición de tiempo
+
+    // Multiplicamos la matriz I (desde la columna I->C) con la matriz B (Ultima columna de la matriz M) para obtener las soluciones
+    for (i = 0; i < I->f; i++)
+    {
+        for (j = 0; j < 1; j++) 
+        {   
+            p = I->c;   // la matriz inversa empieza en la columna I->C 
+            resultado = 0;
+            for (k = 0; k < M->f; k++)
+            {
+                resultado = SumaP( resultado, MultP((I->m)[i].d[p], (M->m)[k].d[M->c - 1]) );
+                p++;
+            }
+
+            if ( I->f <= 6 && I->c <= 7)    // Muestra las soluciones solamente si el sistema es pequeño
+                printf("SOLUCION X%d: %lld\n", i, resultado);
+        }
+    }
+    
+    t1 = clock();   // Fin de medición de tiempo
+
+    // Sumatoria del tiempo de la funcion de matriz inversa + tiempo de la multiplicacion para obtener las soluciones
+    time = ((t1 - t0) / CLOCKS_PER_SEC) + timeInv;  
+
+    return time;
+}
+
 
 void leer_archivo(matriz *M)
 {
