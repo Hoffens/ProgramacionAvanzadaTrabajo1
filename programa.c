@@ -28,13 +28,14 @@ long long InvP( long long a ) ;
 
 //Funciones nuestras
 void generar_sistema(int n, int m, matriz *M);
-void imprimir_sistema(matriz *M);
+void imprimir_sistema(matriz *M, int n, int m);
 void imprimir_solucion(matriz *M, matriz *X);
 void triangulacion_superior(matriz *M);
 void triangulacion_inferior(matriz *M);
 void gaussiana_triangular_superior(matriz *M, matriz *X);
 void eliminacion_gaussiana_completa(matriz *M, matriz *X);
 void matriz_inversa(matriz *M, matriz *I);
+
 void leer_archivo(matriz *M);
 
 int main()
@@ -66,15 +67,17 @@ int main()
     leer_archivo(&M);
     //imprimir_sistema(&M);
     //printf("--------- \n");
-    gaussiana_triangular_superior(&M, &X);
+    //gaussiana_triangular_superior(&M, &X);
     //triangulacion_inferior(&M);
     //eliminacion_gaussiana_completa(&M, &X);
     //matriz_inversa(&M, &X);
+    matriz_inversa(&M, &X);
     //printf("--------- \n");
     //printf("--------- \n");
     //t1 = clock();
     //double time = ((t1 - t0) / CLOCKS_PER_SEC);
     //printf("\n %f \n", time);
+    return 0;
 }
 
 
@@ -99,13 +102,13 @@ void generar_sistema(int n, int m, matriz *M)
 }
 
 
-void imprimir_sistema(matriz *M)
+void imprimir_sistema(matriz *M, int n, int m)
 {   
     int i, j;
-    for (i = 0 ; i < M->f ; i++)
+    for (i = 0 ; i < n ; i++)
     {
         printf("[ ");
-        for (j = 0 ; j < M->c ; j++)
+        for (j = 0 ; j < m ; j++)
         {
             printf("%lld ", (M->m)[i].d[j]);
         }
@@ -119,7 +122,7 @@ void imprimir_solucion(matriz *M, matriz *X)
     int i;
     printf("-----------------------------------------------\n");
     printf("MATRIZ TRIANGULADA: \n");
-    imprimir_sistema(M);
+    imprimir_sistema(M, M->f, M->c);
     printf("-----------------------------------------------\n");
     for (i = 0 ; i < X->f ; i++)
     {
@@ -191,7 +194,7 @@ void gaussiana_triangular_superior(matriz *M, matriz *X)
     {
         printf("-----------------------------------------------\n");
         printf("MATRIZ INICIAL ( %d x %d ): \n", M->f , M->c);
-        imprimir_sistema(M);
+        imprimir_sistema(M, M->f, M->c);
     }
 
     t0 = clock(); //Inicio medición de tiempo
@@ -259,7 +262,7 @@ void eliminacion_gaussiana_completa(matriz *M, matriz *X)
     {
         printf("-----------------------------------------------\n");
         printf("MATRIZ INICIAL ( %d x %d ): \n", M->f , M->c);
-        imprimir_sistema(M);
+        imprimir_sistema(M, M->f, M->c);
     }
 
     t0 = clock(); //inicio medicion de tiempo
@@ -292,147 +295,99 @@ void eliminacion_gaussiana_completa(matriz *M, matriz *X)
     printf("-----------------------------------------------\n");
 }
 
-//NO FUNCIONA
-void matriz_inversa(matriz *M, matriz *I)
-{
-    fila F;
+
+void matriz_inversa(matriz *M, matriz *I) 
+{   
     int i, j, k;
-    long long multiplicador, num_multiplicado;
-    I->c = M->c;
+    long long temp;
+    double t0, t1, time;
+    fila F; //aux fila
+    I->c = M->c - 1; //sacamos la columna aumentada
     I->f = M->f;
     I->m = (fila *)malloc(I->f * sizeof(fila));
-    printf("MATRIZ ORIGINAL \n");
-    imprimir_sistema(M);
-    //INICIO CREACIÓN MATRIZ IDENTIDAD
 
-    for (i = 0 ; i < I->f ; i++)
+    //CREACIÓN DE LA MATRIZ M AUMENTADA CON LA IDENTIDAD (NO SE TOMA EN CUENTA EN EL CALCULO DEL TIEMPO)
+    for (i = 0 ; i < M->f; i++) 
     {
-        F.d = (long long *)malloc(I->c * sizeof(long long));
+        F.d = (long long *)malloc((I->c * 2) * sizeof(long long));
         (I->m)[i] = F;
-        for (j = 0 ; j < I->c ; j++)
+        for (j = 0; j < I->c * 2; j++) 
         {
-            if (i == j)
+            if (j < I->c) 
             {
-                (F.d)[j] = 1;
+                (I->m)[i].d[j] = (M->m)[i].d[j];
             }
             else
             {
-                (F.d)[j] = 0;
+                (I->m)[i].d[j] = 0;
             }
         }
     }
-
-    printf("MATRIZ IDENTIDAD \n");
-    imprimir_sistema(I);
-
-    //FIN CREACIÓN MATRIZ IDENTIDAD
-    
-    //INICIO TRIANGULACIÓN SUPERIOR 
-
-    for (k = 0 ; k < ((M->f)-1) ; k++) //n pasos (n cantidad de filas)
+     
+    // Se agregan los 1's en la diagonal de la matriz aumentada (NO SE TOMA EN CUENTA EN EL CALCULO DEL TIEMPO)
+    for (i = 0; i < I->f; i++)
     {
-        for (i = k + 1 ; i < M->f ; i++)
+        for (j = 0; j < I->f * 2; j++)
         {
-            multiplicador = MultP( (M->m)[i].d[k] , InvP( (M->m)[k].d[k] ) );
-            (M->m)[i].d[k] = 0;
-            (I->m)[i].d[k] = RestaP( (I->m)[i].d[k] , MultP( multiplicador, (M->m)[k].d[k] ) );
-            for (j = k + 1 ; j < M->f ; j++)
-            {
-                num_multiplicado = MultP( multiplicador , (M->m)[k].d[j] );
-                //(M->m)[k].d[j] = MultP( multiplicador , (M->m)[k].d[j] );
-                (M->m)[i].d[j] = RestaP( (M->m)[i].d[j] , num_multiplicado );
-                num_multiplicado = MultP( multiplicador , (I->m)[k].d[j] );
-                //(I->m)[k].d[j] = MultP(multiplicador, (I->m)[k].d[j]); //matriz identidad
-                (I->m)[i].d[j] = RestaP( (I->m)[i].d[j] , num_multiplicado ); //matriz identidad
-            }
-            //(M->m)[k].d[k] = MultP( (M->m)[k].d[k] , multiplicador );
-            //(I->m)[k].d[k] = MultP( (I->m)[k].d[k] , multiplicador ); //matriz identidad
+            if (j == (i + I->f))    // diagonal de la matriz aumentada
+                (I->m)[i].d[j] = 1;
         }
     }
-    printf("MATRIZ TRIANGULADA SUPERIORMENTE \n");
-    imprimir_sistema(M);
-    printf("MATRIZ IDENTIDAD NUEVA \n");
-    imprimir_sistema(I);
-    //FIN TRIANGULACIÓN SUPERIOR
 
-    //INICIO TRIANGULACIÓN INFERIOR
-    
-    for (k = ((M->f)-1) ; k > 0 ; k--) 
-    {   
-        for (i = k - 1 ; i >= 0 ; i--)
-        {
-            multiplicador = MultP( (M->m)[i].d[k] , InvP( (M->m)[k].d[k] ) );
-            (M->m)[i].d[k] = 0;
-            (I->m)[i].d[k] = RestaP( (I->m)[i].d[k] , MultP( multiplicador, (M->m)[k].d[k] ) );
-            for (j = k - 1 ; j >= 0 ; j--)
-            {
-                num_multiplicado = MultP( multiplicador , (M->m)[k].d[j] );
-                //(M->m)[k].d[j] = MultP( multiplicador , (M->m)[k].d[j] );
-                (M->m)[i].d[j] = RestaP( (M->m)[i].d[j] , num_multiplicado );
-                num_multiplicado = MultP( multiplicador , (I->m)[k].d[j] );
-                //(I->m)[k].d[j] = MultP(multiplicador, (I->m)[k].d[j]); //matriz identidad
-                (I->m)[i].d[j] = RestaP( (I->m)[i].d[j] , num_multiplicado ); //matriz identidad
-            }
-            //(M->m)[k].d[k] = MultP( (M->m)[k].d[k] , multiplicador );
-            //(I->m)[k].d[k] = MultP( (I->m)[k].d[k] , multiplicador ); //matriz identidad
-        }
-    }
-    
-    printf("MATRIZ TRIANGULADA INFERIORMENTE \n");
-    imprimir_sistema(M);
-    printf("MATRIZ IDENTIDAD NUEVA \n");
-    imprimir_sistema(I);
+    t0 = clock();   // Inicio medición de tiempo
 
-    long long inv;
-    printf("----------\n");
-    imprimir_sistema(M);
-    printf("----------\n");
-    imprimir_sistema(I);
-    for (i = 0 ; i < M->f ; i++)
+    // Intercambio de filas
+    for (i = I->f - 1; i > 0; i--)
     {
-        for (j = 0 ; j < M->c ; j++)
+        if ((I->m)[i-1].d[0] < (I->m)[i].d[0])
         {
-            if (i == j)
-            {
-                inv = InvP( (M->m)[i].d[j] );
-                (M->m)[i].d[j] = MultP( (M->m)[i].d[j] , inv );
-                (I->m)[i].d[j] = MultP( (I->m)[i].d[j] , inv );
-            }
-            else
-            {
-                (I->m)[i].d[j] = MultP( (I->m)[i].d[j] , inv );    
-            }
+            F.d = (long long *)malloc(I->f * sizeof(long long));
+            F = (I->m)[i];  // Guardamos la fila en una variable auxiliar
+            (I->m)[i] = (I->m)[i-1];
+            (I->m)[i-1] = F;
         }
     }
-    printf("----------\n");
-    imprimir_sistema(M);
-    printf("----------\n");
-    imprimir_sistema(I);
-    //(I->m)[0].d[0] = MultP( (I->m)[0].d[0] , InvP( (M->m)[0].d[0] ) ); // se multiplica el elemento I[0][0] por 1/M[0][0]
-    //imprimir_sistema(M);
-    //imprimir_sistema(I);
-    //FIN TRIANGULACIÓN INFERIOR
-/*
-    //INICIO CONVERTIR DIAGONAL EN 1
 
-    long long inv;
-
-    for (i = 0 ; i < M->f ; i++)
+    // Reemplaza una fila por la suma de si misma y la constante 
+    for (i = 0; i < I->f; i++)
     {
-        for (j = i ; j < M->c ; j++)
+        for (j = 0; j < I->f; j++)
         {
-            inv = InvP((M->m)[i].d[j]);
-            (M->m)[i].d[j] = MultP( (M->m)[i].d[j] , inv ); // SE PUEDE CAMBIAR POR 1
-            (I->m)[i].d[j] = MultP( (I->m)[i].d[j] , inv ); //SE MULTIPLICA POR 1/Mij
+            if (j != i)
+            {
+                temp = MultP( (I->m)[j].d[i], InvP( (I->m)[i].d[i] ) );  
+                for (k = 0; k < 2 * I->f; k++) 
+                {
+                    (I->m)[j].d[k] = RestaP( (I->m)[j].d[k], MultP( (I->m)[i].d[k], temp ) );
+                }
+            }
         }
     }
 
+    // Multiplica cada fila por un numero distinto de 0 y divide los numeros de la fila por los numeros de la diagonal
+    for (i = 0; i < I->f; i++)
+    {
+        temp = (I->m)[i].d[i];
+        for (j = 0; j < 2 * I->f; j++)
+        {
+            (I->m)[i].d[j] = MultP( (I->m)[i].d[j], InvP( temp ) );
+        }
+    }
 
-    //FIN CONVERTIR DIAGONAL EN 1
-    */
-    //imprimir_sistema(I);
+    t1 = clock();   // Fin de medición de tiempo
+    
+    // Muestra en pantalla la matriz aumentada final, a la izquierda queda la identidad y a la derecha la inversa
+    if ( I->f <= 6 && I->c <= 7) 
+    {
+        printf("Matriz inversa: \n");
+        imprimir_sistema(I, I->f, I->c * 2); 
+    }
+    
+    time = ((t1 - t0) / CLOCKS_PER_SEC);
+    printf("FINALIZADO. \n");
+    printf("TIEMPO TOTAL EN SEGUNDOS: %f  \n" , time);
+    printf("-----------------------------------------------\n");
 }
-
 
 void leer_archivo(matriz *M)
 {
