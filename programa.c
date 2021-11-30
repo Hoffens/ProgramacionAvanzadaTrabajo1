@@ -70,13 +70,16 @@ int main()
     //printf("--------- \n");
     //gaussiana_triangular_superior(&M, &X);
     //triangulacion_inferior(&M);
-    generar_sistema(10000, 10001, &M);
+    generar_sistema(1000, 1001, &M);
     printf("Se genero correctamente el sistema, se inicia la eliminacion gaussiana completa...\n");
     time1 = eliminacion_gaussiana_completa(&M, &X);
     //matriz_inversa(&M, &X);
     //matriz_inversa(&M, &X);
     //time1 = solucion_matriz_inversa(&M, &X);
     printf("TIEMPO TOTAL EN SEGUNDOS: %f  \n" , time1);
+    getchar();
+    free(M.m);
+    free(X.m);
     //printf("--------- \n");
     //printf("--------- \n");
     //t1 = clock();
@@ -307,7 +310,7 @@ double matriz_inversa(matriz *M, matriz *I)
 
     t0 = clock();   // Inicio medición de tiempo
 
-    //CREACIÓN DE LA MATRIZ M AUMENTADA CON LA IDENTIDAD (NO SE CONSIDERA PARA LA MEDICIÓN DEL TIEMPO)
+    //CREACIÓN DE LA MATRIZ M AUMENTADA CON LA IDENTIDAD 
     for (i = 0 ; i < M->f; i++) 
     {
         F.d = (long long *)malloc((I->c * 2) * sizeof(long long));
@@ -325,7 +328,7 @@ double matriz_inversa(matriz *M, matriz *I)
         }
     }
      
-    // Se agregan los 1's en la diagonal de la matriz aumentada (NO SE CONSIDERA PARA LA MEDICIÓN DEL TIEMPO)
+    // Se agregan los 1's en la diagonal de la matriz aumentada 
     for (i = 0; i < I->f; i++)
     {
         for (j = 0; j < I->f * 2; j++)
