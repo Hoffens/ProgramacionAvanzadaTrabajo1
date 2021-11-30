@@ -36,7 +36,7 @@ double gaussiana_triangular_superior(matriz *M, matriz *X);
 double eliminacion_gaussiana_completa(matriz *M, matriz *X);
 double matriz_inversa(matriz *M, matriz *I);
 double solucion_matriz_inversa(matriz *M, matriz *X); // Utiliza la matriz inversa para dar solución al sistema
-int Menu();
+
 
 void leer_archivo(matriz *M);
 
@@ -76,7 +76,7 @@ int main()
     // matriz_inversa(&M, &X);
     // matriz_inversa(&M, &X);
     // time1 = solucion_matriz_inversa(&M, &X);
-    printf("TIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
+    //printf("TIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
     // printf("--------- \n");
     // printf("--------- \n");
     // t1 = clock();
@@ -84,14 +84,15 @@ int main()
     // printf("\n %f \n", time);
 
     // Menu
-    char menu = '1';
+    char menu = '0';
     int Tamanio;
-    while (menu != '0')
-    {
+    
+    do{
         printf("\n Menu\n1. Gemerar matriz NxN+1\n2. leer desde archivo.\n3. Eliminacion gaussiana completa\n4.Triangualar superior");
-        printf("\n5.Matriz inversa");
+        printf("\n5.Matriz inversa\n\n");
 
         scanf("%c", &menu);
+        
         switch (menu){
             case '1':
                 printf("ingrese N para generar NxN+1");
@@ -103,7 +104,7 @@ int main()
 
             case '2':
 
-                // statements
+                
                 break;            
                 
             case '3':
@@ -112,22 +113,25 @@ int main()
                 time1 = eliminacion_gaussiana_completa(&M, &X);
                 printf("\nTIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
                 
-                // statements
+                
                 break;
             case '4':
 
 
                 triangulacion_superior(&M);
+                
+                break;
                 //printf("\nTIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
-
+            case '5':
 
 
                 break;
                 
-                default:
-                // default statements
+            default:
+            printf("\ncoloque una opcion correcta\n");
+                
             }
-    }
+    }while (menu != '0');
 
     return 0;
 }
