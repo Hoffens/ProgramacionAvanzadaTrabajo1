@@ -84,7 +84,7 @@ int main()
     // printf("\n %f \n", time);
 
     // Menu
-    char menu = '0';
+    int menu = 0;
     int Tamanio;
     
     do{
@@ -93,10 +93,10 @@ int main()
 
         printf("\n0. Salir\n\n");
 
-        scanf("%c", &menu);
+        scanf("%d", &menu);
         
         switch (menu){
-            case '1':
+            case 1:
                 printf("ingrese N para generar NxN+1");
                 scanf("%d", &Tamanio);
                 generar_sistema(Tamanio, Tamanio+1, &M);
@@ -105,12 +105,12 @@ int main()
 
                 break;
 
-            case '2':
+            case 2:
 
                 printf("opcion 2");
                 break;            
                 
-            case '3':
+            case 3:
 
 
                 time1 = eliminacion_gaussiana_completa(&M, &X);
@@ -118,14 +118,14 @@ int main()
                 
                 
                 break;
-            case '4':
+            case 4:
 
 
                 triangulacion_superior(&M);
                 
                 break;
                 //printf("\nTIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
-            case '5':
+            case 5:
                 
                 printf("opcion 5");
 
@@ -135,7 +135,7 @@ int main()
             printf("\ncoloque una opcion correcta\n");
                 
             }
-    }while (menu != '0');
+    }while (menu != 0);
 
 
     return 0;
