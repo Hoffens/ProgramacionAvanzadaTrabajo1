@@ -89,7 +89,9 @@ int main()
     
     do{
         printf("\n Menu\n1. Gemerar matriz NxN+1\n2. leer desde archivo.\n3. Eliminacion gaussiana completa\n4.Triangualar superior");
-        printf("\n5.Matriz inversa\n\n");
+        printf("\n5.Matriz inversa\n");
+
+        printf("\n0. Salir\n\n");
 
         scanf("%c", &menu);
         
@@ -98,13 +100,14 @@ int main()
                 printf("ingrese N para generar NxN+1");
                 scanf("%d", &Tamanio);
                 generar_sistema(Tamanio, Tamanio+1, &M);
+                imprimir_sistema(&M, Tamanio, Tamanio+1);
                 printf("Se genero sistema\n\n\n");
 
                 break;
 
             case '2':
 
-                
+                printf("opcion 2");
                 break;            
                 
             case '3':
@@ -123,7 +126,8 @@ int main()
                 break;
                 //printf("\nTIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
             case '5':
-
+                
+                printf("opcion 5");
 
                 break;
                 
@@ -132,6 +136,7 @@ int main()
                 
             }
     }while (menu != '0');
+
 
     return 0;
 }
