@@ -1,7 +1,10 @@
+// Gino Verardi, Nicolas Fernandez
+// Programacion Avanzada, Laboratorio 1. LCC, USACH
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+
 
 #define P (long long)3781996138433268199
 #define Pa (long long)1761129190
@@ -32,137 +35,124 @@ void imprimir_sistema(matriz *M, int n, int m);
 void imprimir_solucion(matriz *M, matriz *X);
 void triangulacion_superior(matriz *M);
 void triangulacion_inferior(matriz *M);
-double gaussiana_triangular_superior(matriz *M, matriz *X);
-double eliminacion_gaussiana_completa(matriz *M, matriz *X);
-double matriz_inversa(matriz *M, matriz *I);
-double solucion_matriz_inversa(matriz *M, matriz *X); // Utiliza la matriz inversa para dar solución al sistema
+double gaussiana_triangular_superior(matriz *M, matriz *X);     // retorna el tiempo de ejecucion en segundos
+double eliminacion_gaussiana_completa(matriz *M, matriz *X);    // retorna el tiempo de ejecucion en segundos
+double matriz_inversa(matriz *M, matriz *I);                    // retorna el tiempo de ejecucion en segundos
+double solucion_matriz_inversa(matriz *M, matriz *X);           // retorna el tiempo de ejecucion en segundos
 
 
 void leer_archivo(matriz *M);
 
 int main()
 {
-    // falta limpiar la memoria
     matriz M, X;
     int i, j = 0;
     double t0, t1, time1;
-    // matriz *xd, *xd2;
-    // xd = &M;
-    // xd2 = &X;
-    // t0 = clock();
-    // printf("%ld \n", clock());
     srand(time(NULL));
-    // long long *c;
-    // t0 = clock();
-    /*
-    for ( i = 0 ; i < 600 ; i++)
-    {
-        generar_sistema(300, 301, &M);
-        gaussiana_triangular_superior(&M, &X);
-
-    t1 = clock();
-    time1 = ((t1 - t0) / CLOCKS_PER_SEC);
-    printf("TIEMPO TOTAL: %f \n ", time1);
-    */
-<<<<<<< HEAD
-    //generar_sistema(6, 7, &M);
-    //printf("Primo P => %lld\n", P);
-    //leer_archivo(&M);
-    //imprimir_sistema(&M);
-    //printf("--------- \n");
-    //gaussiana_triangular_superior(&M, &X);
-    //triangulacion_inferior(&M);
-    generar_sistema(1000, 1001, &M);
-    printf("Se genero correctamente el sistema, se inicia la eliminacion gaussiana completa...\n");
-    time1 = eliminacion_gaussiana_completa(&M, &X);
-    //matriz_inversa(&M, &X);
-    //matriz_inversa(&M, &X);
-    //time1 = solucion_matriz_inversa(&M, &X);
-    printf("TIEMPO TOTAL EN SEGUNDOS: %f  \n" , time1);
-    getchar();
-    free(M.m);
-    free(X.m);
-    //printf("--------- \n");
-    //printf("--------- \n");
-    //t1 = clock();
-    //double time = ((t1 - t0) / CLOCKS_PER_SEC);
-    //printf("\n %f \n", time);
-=======
-    // generar_sistema(6, 7, &M);
-    // printf("Primo P => %lld\n", P);
-    // leer_archivo(&M);
-    // imprimir_sistema(&M);
-    // printf("--------- \n");
-    // gaussiana_triangular_superior(&M, &X);
-    // triangulacion_inferior(&M);
-    
-    
-    // matriz_inversa(&M, &X);
-    // matriz_inversa(&M, &X);
-    // time1 = solucion_matriz_inversa(&M, &X);
-    //printf("TIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
-    // printf("--------- \n");
-    // printf("--------- \n");
-    // t1 = clock();
-    // double time = ((t1 - t0) / CLOCKS_PER_SEC);
-    // printf("\n %f \n", time);
-
-    // Menu
     int menu = 0;
     int Tamanio;
     
-    do{
-        printf("\n Menu\n1. Gemerar matriz NxN+1\n2. leer desde archivo.\n3. Eliminacion gaussiana completa\n4.Triangualar superior");
-        printf("\n5.Matriz inversa\n");
+    do 
+    {
+        printf("\n Menu\n1. Generar matriz NxN+1\n2. Leer sistema desde archivo\n3. Resolver por eliminacion gaussiana completa");
+        printf("\n4. Resolver por triangulacion superior\n5. Resolver por matriz inversa\n6. Matriz inversa");
 
         printf("\n0. Salir\n\n");
 
+        printf("Ingrese opcion: ");
         scanf("%d", &menu);
         
-        switch (menu){
+        switch (menu) 
+        {
             case 1:
-                printf("ingrese N para generar NxN+1");
+
+                printf("Ingrese N para generar sistema NxN+1: ");
                 scanf("%d", &Tamanio);
                 generar_sistema(Tamanio, Tamanio+1, &M);
-                imprimir_sistema(&M, Tamanio, Tamanio+1);
-                printf("Se genero sistema\n\n\n");
+                printf("Se genero el sistema.\n\n\n");
 
                 break;
 
             case 2:
 
-                printf("opcion 2");
+                leer_archivo(&M);
                 break;            
                 
             case 3:
 
-
+                printf("Resolviendo...");
                 time1 = eliminacion_gaussiana_completa(&M, &X);
-                printf("\nTIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
-                
-                
+                printf("\nFINALIZADO, TIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
+
+                // se libera la memoria utilizada por los sistemas
+                for (int i = 0; i < Tamanio; i++)
+                {
+                    free((M.m)[i].d);
+                    free((X.m)[i].d);
+                }
+                free((M.m));
+                free((X.m));
+
                 break;
+
             case 4:
 
+                printf("Resolviendo...");
+                time1 = gaussiana_triangular_superior(&M, &X);
+                printf("\nFINALIZADO, TIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
 
-                triangulacion_superior(&M);
-                
+                // se libera la memoria utilizada por los sistemas
+                for (int i = 0; i < Tamanio; i++)
+                {
+                    free((M.m)[i].d);
+                    free((X.m)[i].d);
+                }
+                free((M.m));
+                free((X.m));
+
                 break;
-                //printf("\nTIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
+
             case 5:
                 
-                printf("opcion 5");
+                printf("Resolviendo...");
+                time1 = solucion_matriz_inversa(&M, &X);
+                printf("\nFINALIZADO, TIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
+
+                // se libera la memoria utilizada por los sistemas
+                for (int i = 0; i < Tamanio; i++)
+                {
+                    free((M.m)[i].d);
+                    free((X.m)[i].d);
+                }
+                free((M.m));
+                free((X.m));
 
                 break;
-                
+            
+            case 6:
+
+                printf("Resolviendo...");
+                time1 = matriz_inversa(&M, &X);
+                printf("\nFINALIZADO, TIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
+
+                // se libera la memoria utilizada por los sistemas
+                for (int i = 0; i < Tamanio; i++)
+                {
+                    free((M.m)[i].d);
+                    free((X.m)[i].d);
+                }
+                free((M.m));
+                free((X.m));
+
+                break;
+
             default:
-            printf("\ncoloque una opcion correcta\n");
-                
-            }
-    }while (menu != 0);
+                printf("\nDebe ingresar una opcion correcta.\n");
 
+        }
 
->>>>>>> develop-menu
+    } while (menu != 0);
+
     return 0;
 }
 
@@ -183,7 +173,6 @@ void generar_sistema(int n, int m, matriz *M)
             (F.d)[j] = (long long)(rand() % P);
         }
     }
-    // printf("%ld ", (M->m)[0].d[1]); //EJEMPLO, NO BORRAR: se accede al elemento de la fila 0 columna 1
 }
 
 void imprimir_sistema(matriz *M, int n, int m)
@@ -380,13 +369,8 @@ double matriz_inversa(matriz *M, matriz *I)
 
     t0 = clock(); // Inicio medición de tiempo
 
-<<<<<<< HEAD
-    //CREACIÓN DE LA MATRIZ M AUMENTADA CON LA IDENTIDAD 
-    for (i = 0 ; i < M->f; i++) 
-=======
-    // CREACIÓN DE LA MATRIZ M AUMENTADA CON LA IDENTIDAD (NO SE CONSIDERA PARA LA MEDICIÓN DEL TIEMPO)
+    // CREACIÓN DE LA MATRIZ M AUMENTADA CON LA IDENTIDAD
     for (i = 0; i < M->f; i++)
->>>>>>> develop-menu
     {
         F.d = (long long *)malloc((I->c * 2) * sizeof(long long));
         (I->m)[i] = F;
@@ -402,13 +386,8 @@ double matriz_inversa(matriz *M, matriz *I)
             }
         }
     }
-<<<<<<< HEAD
      
     // Se agregan los 1's en la diagonal de la matriz aumentada 
-=======
-
-    // Se agregan los 1's en la diagonal de la matriz aumentada (NO SE CONSIDERA PARA LA MEDICIÓN DEL TIEMPO)
->>>>>>> develop-menu
     for (i = 0; i < I->f; i++)
     {
         for (j = 0; j < I->f * 2; j++)
@@ -515,11 +494,15 @@ void leer_archivo(matriz *M)
     long long num;
     FILE *archivo;
     char bus;
+    char nombreArchivo[30];
 
     fila F;
     int i, j;
 
-    archivo = fopen("matriz2021.txt", "r");
+    printf("Ingrese nombre del archivo (con extension, ejemplo: matriz.txt): ");
+    scanf("%s", nombreArchivo);
+
+    archivo = fopen(nombreArchivo, "r");
 
     if (archivo == NULL)
     {
@@ -562,6 +545,9 @@ void leer_archivo(matriz *M)
     }
 
     fclose(archivo);
+
+    if (archivo != NULL)
+        printf("\nSistema cargado correctamente. \n\n");
 }
 
 long long SumaP(long long a, long long b)
