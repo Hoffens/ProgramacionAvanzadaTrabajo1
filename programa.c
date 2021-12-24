@@ -80,7 +80,7 @@ int main()
                 
             case 3:
 
-                printf("Resolviendo...");
+                printf("Resolviendo..."); 
                 time1 = eliminacion_gaussiana_completa(&M, &X);
                 printf("\nFINALIZADO, TIEMPO TOTAL EN SEGUNDOS: %f  \n", time1);
 
@@ -91,7 +91,7 @@ int main()
                     free((X.m)[i].d);
                 }
                 free((M.m));
-                free((X.m));
+                free((X.m)); 
 
                 break;
 
